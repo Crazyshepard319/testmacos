@@ -38,9 +38,11 @@ Farm Remote Access, gdzie mechanizm instalacji może się różnić.
 ### 1. Pobierz pliki z repo
 
 ```
-git clone <adres-twojego-repo>
-cd <repo>/runda-2/ios-benchmark
+git clone https://github.com/Crazyshepard319/testmacos.git
+cd testmacos
 ```
+
+(Pliki `ContentView.swift`, `README.md`, `calibration_sample.wav` są bezpośrednio w korzeniu tego repo.)
 
 ### 2. Stwórz nowy projekt Xcode (Xcode sam generuje poprawną strukturę --
 ### bezpieczniej niż ręcznie pisany plik projektu)
