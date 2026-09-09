@@ -4,11 +4,10 @@
 // (CoreML) zamiast sherpa-onnx -- nie ma sprawdzonej, publicznej konwersji
 // Parakeet TDT v3 do CoreML, WhisperKit to gotowy, utrzymywany port.
 //
-// UWAGA: ten kod NIE zostal skompilowany ani przetestowany przez Claude'a --
-// pisane na Linuksie bez dostepu do Xcode/macOS. Traktuj jako pierwszy
-// szkic do przetestowania na miejscu (najpierw Symulator, potem realne
-// urzadzenie), nie jako gotowy, zweryfikowany kod (w przeciwienstwie do
-// wersji Androidowej, ktora ma potwierdzone BUILD SUCCESSFUL).
+// STATUS: przetestowane i dzialajace na Symulatorze iOS (poprawny polski
+// tekst rozpoznany z proby kalibracyjnej). NIE testowane jeszcze na
+// prawdziwym urzadzeniu -- liczby RTF/RAM z Symulatora sa niemiarodajne
+// (Symulator dzieli CPU z reszta Maca), potrzebne do tego realne iPhone'y.
 
 import AVFoundation
 import SwiftUI

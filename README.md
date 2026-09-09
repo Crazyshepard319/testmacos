@@ -1,125 +1,101 @@
 # ASR Benchmark iOS (Zadanie 4)
 
-Odpowiednik `android-benchmark/` na iOS, przez [WhisperKit](https://github.com/argmaxinc/WhisperKit)
-(CoreML) zamiast sherpa-onnx/Parakeet.
+Aplikacja do pomiaru RTF/RAM/throttlingu transkrypcji mowy na iPhone,
+przez [WhisperKit](https://github.com/argmaxinc/WhisperKit) (CoreML).
+Odpowiednik `android-benchmark/` na iOS.
 
-## Ważne zastrzeżenie -- to jest kod NIEZWERYFIKOWANY
+**Status: kod przetestowany i działający** (zweryfikowany na Symulatorze
+iOS — poprawnie rozpoznaje polską próbkę kalibracyjną). Nie testowany
+jeszcze na prawdziwym iPhonie — do tego służy ta instrukcja.
 
-W przeciwieństwie do `android-benchmark/` (który realnie skompilowałem i
-przetestowałem -- `BUILD SUCCESSFUL`), ten kod **nie został skompilowany ani
-uruchomiony przez Claude'a**. Piszę go z Linuksa, bez dostępu do Xcode/macOS
--- fizycznie nie da się zbudować `.ipa` bez Xcode, a Xcode działa tylko na
-macOS. To pierwszy szkic do wspólnego przetestowania na Twoim Macu przez VNC,
-nie gotowe, sprawdzone rozwiązanie. Jeśli Xcode zgłosi błąd kompilacji --
-wklej mi go, poprawię kod na tej podstawie.
+## Co potrzebujesz
 
-## Dlaczego WhisperKit, nie Parakeet
+- Mac z zainstalowanym Xcode
+- Kabel do podłączenia iPhone'a do tego Maca (Lightning albo USB-C, zależnie od modelu)
+- iPhone z odblokowanym ekranem, żeby zatwierdzić "Trust This Computer"
 
-Nie ma sprawdzonej, publicznej konwersji Parakeet TDT v3 (transducer) do
-CoreML -- brief wspomina, że robi to `vays.app`, ale narzędzie nie jest
-publiczne. WhisperKit to gotowy, aktywnie utrzymywany port Whisper do
-CoreML (Argmax) -- nic nie trzeba konwertować, tylko dodać jako zależność.
+To wszystko — **nie potrzeba żadnego konta Apple Developer płatnego, żadnego
+eksportu `.ipa`, żadnej usługi typu Firebase/BrowserStack/AWS.** Podłączenie
+telefonu bezpośrednio do Xcode i naciśnięcie Run wystarczy — Xcode sam
+zajmie się podpisywaniem dla tego konkretnego telefonu automatycznie.
 
-## Uwaga o podpisie (masz tylko darmowe Apple ID)
+## Krok po kroku
 
-Firebase Test Lab dla iOS wymaga `.ipa` z **podpisem deweloperskim, nie
-dystrybucyjnym**. Darmowe Apple ID (Personal Team) zwykle ogranicza podpis
-deweloperski do niewielkiej liczby *zarejestrowanych* urządzeń -- a
-urządzenia w farmie Firebase nie są zarejestrowane w Twoim koncie. **Nie mam
-pewności, czy to faktycznie zablokuje instalację na farmie** (nie
-testowałem) -- może się okazać, że działa, może nie. Jeśli `.ipa` nie
-zainstaluje się na urządzeniu Firebase (błąd przy instalacji na farmie),
-to jest dokładnie ten powód, i wtedy realna opcja to płatny Apple Developer
-Program (99$/rok) -- albo spróbowanie BrowserStack App Live / AWS Device
-Farm Remote Access, gdzie mechanizm instalacji może się różnić.
-
-## Krok po kroku (na Macu, przez VNC)
-
-### 1. Pobierz pliki z repo
+### 1. Pobierz projekt
 
 ```
 git clone https://github.com/Crazyshepard319/testmacos.git
 cd testmacos
 ```
 
-(Pliki `ContentView.swift`, `README.md`, `calibration_sample.wav` są bezpośrednio w korzeniu tego repo.)
-
-### 2. Stwórz nowy projekt Xcode (Xcode sam generuje poprawną strukturę --
-### bezpieczniej niż ręcznie pisany plik projektu)
+### 2. Stwórz projekt Xcode
 
 1. Xcode → **File → New → Project**
 2. **iOS → App**
 3. Product Name: `ASRBenchmarkIOS`, Interface: **SwiftUI**, Language: **Swift**
-4. Zapisz projekt w dowolnym miejscu (np. obok tego folderu)
+4. Zapisz gdziekolwiek
 
-### 3. Dodaj WhisperKit jako zależność
+### 3. Dodaj zależność WhisperKit
 
 1. **File → Add Package Dependencies...**
-2. Wklej URL: `https://github.com/argmaxinc/argmax-oss-swift`
-3. Wybierz regułę wersji (np. "Up to Next Major", from 0.9.0)
-4. **Add Package** → z listy produktów zaznacz **WhisperKit** → **Add Package**
+2. Wklej: `https://github.com/argmaxinc/argmax-oss-swift`
+3. Naciśnij Enter/Return w polu wyszukiwania (nawet jeśli pokaże "No Results" — to normalne, i tak rozwiąże adres)
+4. **Add Package** → zaznacz produkt **WhisperKit** → **Add Package**
 
-(Tak, adres repo to `argmax-oss-swift`, nie `WhisperKit` -- projekt się
-przeniósł/skonsolidował pod nową nazwę; w kodzie nadal `import WhisperKit`.)
+### 4. Podmień pliki
 
-### 4. Podmień/dodaj pliki
+- Usuń wygenerowany `ContentView.swift` z projektu (prawy klik → Delete → Move to Trash)
+- Przeciągnij `ContentView.swift` ze sklonowanego repo do nawigatora Xcode
+- Przeciągnij też `calibration_sample.wav` ze sklonowanego repo do nawigatora Xcode
+- Przy obu: zaznacz **"Copy items if needed"** i upewnij się, że checkbox przy targecie `ASRBenchmarkIOS` jest zaznaczony
 
-1. Skopiuj zawartość `ContentView.swift` z tego folderu do
-   `ContentView.swift` w swoim projekcie (nadpisz wygenerowany szablon).
-2. Przeciągnij `calibration_sample.wav` (z tego folderu) do nawigatora
-   projektu w Xcode. W oknie dialogowym: zaznacz **"Copy items if needed"**
-   i upewnij się, że **Target Membership** dla `ASRBenchmarkIOS` jest
-   zaznaczone (inaczej `Bundle.main.path(...)` go nie znajdzie).
+### 5. Podłącz iPhone i uruchom
 
-### 5. Najpierw test na Symulatorze (szybka, bezpieczna weryfikacja)
+1. Podłącz iPhone kablem do Maca
+2. Na telefonie zatwierdź **"Trust This Computer"** jeśli się pojawi
+3. W Xcode, u góry obok przycisku ▶, wybierz z listy urządzeń **ten konkretny iPhone** (powinien pojawić się z nazwą, np. "iPhone (2)" albo jak go nazwaliście)
+4. Kliknij ▶ (Run)
 
-1. U góry Xcode wybierz jako target dowolny symulator iPhone (np. "iPhone 16")
-2. **Product → Run** (▶) albo Cmd+R
-3. Jeśli się skompiluje i uruchomi -- kliknij **"Uruchom benchmark"** w
-   symulatorze i sprawdź, czy log się wypełnia bez błędu.
+**Za pierwszym razem Xcode może poprosić o zalogowanie Apple ID** (Xcode →
+Settings → Accounts, jeśli nie jest jeszcze zalogowany) — wystarczy zwykłe,
+darmowe Apple ID, podłączony fizycznie telefon załatwia resztę.
 
-**To nie mierzy realnej wydajności** (symulator ≠ prawdziwy chip) -- to
-tylko sprawdza, że kod w ogóle działa, zanim przejdziesz do prawdziwego
-urządzenia/eksportu.
+**Może się też pojawić komunikat na samym iPhonie**: Ustawienia → Ogólne →
+VPN i zarządzanie urządzeniem → zaufaj deweloperowi (jednorazowo, przy
+pierwszej instalacji apki spoza App Store).
 
-Jeśli tu wystąpi błąd kompilacji -- wklej mi go w całości, poprawię kod.
+### 6. Test
 
-### 6. Eksport `.ipa` z podpisem deweloperskim
+Na ekranie telefonu (albo w symulatorze na Macu podczas testu) pojawi się
+przycisk **"Uruchom benchmark"**. Kliknij go (na telefonie — dotknij palcem
+albo dłonią jeśli robicie to fizycznie).
 
-1. U góry wybierz **"Any iOS Device (arm64)"** jako target (nie symulator)
-2. **Product → Archive** (poczekaj, aż się zbuduje)
-3. W oknie Organizer, który się otworzy: **Distribute App**
-4. Wybierz **Development** (nie App Store Connect, nie Enterprise, nie Ad Hoc)
-5. Xcode poprosi o wybór zespołu podpisującego -- wybierz swój Apple ID
-   (Personal Team)
-6. Dokończ kreator -- na końcu dostaniesz folder z plikiem `.ipa`
+Apka zrobi 10 kolejnych transkrypcji tej samej 10-sekundowej próbki audio
+(zawiera "VAS 6 na 10") bez przerwy, i pokaże na ekranie:
+- RTF (median/p90) każdej rundy — realna szybkość na tym konkretnym iPhonie
+- Throttling — czy runda 10 jest wolniejsza niż runda 1 (przegrzewanie)
+- Zużycie pamięci (PSS) w każdej rundzie
+- Rozpoznany tekst — powinno wyjść coś zbliżonego do oryginalnej treści po polsku
 
-### 7. Wgraj `.ipa` do Firebase Test Lab
+### 7. Zapisz wynik
 
-Dokładnie tak samo jak dla Androida: Firebase Console → Test Lab → Uruchom
-test → Browse → wskaż `.ipa` → typ testu **Robo test** (iOS ma swój
-odpowiednik automatycznego eksplorowania UI, tak jak Android) → wybierz
-urządzenia → Start.
+Zrób zdjęcie/zrzut ekranu telefonu z pełnym podsumowaniem (przewiń log w
+dół do sekcji "=== PODSUMOWANIE ===") — albo po prostu przepisz/wyślij mi
+te kilka linijek tekstu, tak jak robiliśmy dla wyników z Androida.
 
-**Jeśli test padnie na etapie instalacji aplikacji** (nie na benchmarku) --
-to prawdopodobnie właśnie ograniczenie podpisu z darmowego Apple ID, patrz
-zastrzeżenie wyżej.
+**Powtórz na obu telefonach (iPhone 13 i iPhone 17)** — to jest ten sam
+sens co dwa punkty danych z Androida (starszy vs najnowszy) i dokładnie
+uzupełnia tabelę "model × urządzenie" z briefu o platformę iOS.
 
-## Znane ryzyka, o których wiem z doświadczenia z Androidem
+## Jeśli coś nie zadziała
 
-- **Pobieranie modelu przy starcie może się powtórzyć jako problem** --
-  WhisperKit domyślnie pobiera model z Hugging Face przy pierwszym
-  uruchomieniu, dokładnie jak pierwsza (wadliwa) wersja Androida. Jeśli
-  test na Firebase pada w trakcie ładowania modelu / na timeoucie --to
-  ten sam mechanizm, który już raz naprawiliśmy przez dołączenie modelu do
-  APK. Dla iOS odpowiednikiem byłoby dołączenie skonwertowanego modelu
-  CoreML jako zasobu do bundle -- nie zrobione teraz prewencyjnie (dodaje
-  złożoność do już niepewnego kodu), ale wiadomo co robić, jeśli się
-  powtórzy.
-- **Format zwracanego wyniku z `pipe.transcribe()`** -- kod zakłada, że
-  zwraca opcjonalną tablicę obiektów z polem `.text`; jeśli aktualna wersja
-  API się różni, Xcode zgłosi to jasno przy kompilacji.
-- **Minimalny iOS deployment target** -- nie ustawiłem świadomie konkretnej
-  wartości, zostaw domyślną z kreatora Xcode; jeśli WhisperKit wymaga
-  wyższej wersji niż domyślna, Xcode sam to zgłosi i trzeba będzie podnieść
-  "iOS Deployment Target" w ustawieniach projektu.
+- **Błąd kompilacji w Xcode** → wklej mi dokładną treść błędu (Issue
+  Navigator — ikonka trójkąta z wykrzyknikiem w lewym pasku)
+- **Ładowanie modelu trwa bardzo długo (minuty) przy pierwszym uruchomieniu**
+  → to normalne, WhisperKit pobiera model (~630 MB) z sieci przy pierwszym
+  starcie na danym urządzeniu. Drugie uruchomienie na tym samym telefonie
+  powinno być dużo szybsze (model już zapisany lokalnie) — **do właściwego
+  pomiaru RTF/throttlingu liczy się dopiero DRUGIE uruchomienie**, nie
+  pierwsze (pierwsze zawiera czas pobierania, nie tylko ładowania)
+- **"Rozpoznany tekst" pusty albo bez sensu** → to już naprawiony problem
+  (wymuszony polski język w kodzie), ale jeśli się powtórzy — daj znać
