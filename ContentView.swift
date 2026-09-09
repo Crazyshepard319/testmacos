@@ -118,7 +118,13 @@ struct ContentView: View {
         setStatus("Ładuję model (WhisperKit)...")
         let pssBeforeLoad = memoryUsageMB()
         let loadStart = Date()
-        let pipe = try await WhisperKit()
+        // Wymuszony konkretny, wielojezyczny model (nie ".en") -- domyslny
+        // WhisperKit() bez argumentow dobral model tylko-angielski u nas
+        // (rozpoznany tekst na polskiej probce: "The"). To ten sam model
+        // (Whisper large-v3-turbo) co juz sprawdzony jakosciowo na laptopie
+        // w tej rundzie -- porownywalny punkt odniesienia.
+        let whisperConfig = WhisperKitConfig(model: "openai_whisper-large-v3-v20240930_turbo")
+        let pipe = try await WhisperKit(whisperConfig)
         let loadTimeS = Date().timeIntervalSince(loadStart)
         let pssAfterLoad = memoryUsageMB()
         appendLog("Czas ładowania modelu do pamięci: \(String(format: "%.2f", loadTimeS)) s")
