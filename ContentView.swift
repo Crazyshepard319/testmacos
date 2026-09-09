@@ -148,7 +148,7 @@ struct ContentView: View {
             let t0 = Date()
             let results = try await pipe.transcribe(audioPath: audioPath)
             let elapsedS = Date().timeIntervalSince(t0)
-            let text = results?.map(\.text).joined(separator: " ") ?? ""
+            let text = results.map(\.text).joined(separator: " ")
             if round == 1 { firstText = text }
 
             let rtf = elapsedS / durationS
