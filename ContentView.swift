@@ -105,7 +105,7 @@ struct ContentView: View {
         appendLog("=== ASR Benchmark iOS (runda 2, Zadanie 4) ===")
         appendLog("Czas: \(df.string(from: Date()))")
         appendLog("Urządzenie: \(deviceModelIdentifier()), iOS \(UIDevice.current.systemVersion)")
-        appendLog("Model: WhisperKit (CoreML, model domyślny dla urządzenia)")
+        appendLog("Model: WhisperKit (CoreML, openai_whisper-large-v3-v20240930_turbo, jezyk wymuszony: pl)")
         appendLog("")
 
         // --- 1. Ładowanie modelu do pamięci ---
@@ -152,7 +152,10 @@ struct ContentView: View {
         for round in 1...nRounds {
             setStatus("Test throttlingu: \(round)/\(nRounds)...")
             let t0 = Date()
-            let results = try await pipe.transcribe(audioPath: audioPath)
+            // Jezyk wymuszony na polski -- auto-detekcja na krotkiej (10s)
+            // probce dala pusty wynik (zero rozpoznanych segmentow).
+            let decodeOptions = DecodingOptions(language: "pl")
+            let results = try await pipe.transcribe(audioPath: audioPath, decodeOptions: decodeOptions)
             let elapsedS = Date().timeIntervalSince(t0)
             let text = results.map(\.text).joined(separator: " ")
             if round == 1 { firstText = text }
