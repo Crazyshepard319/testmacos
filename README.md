@@ -5,14 +5,12 @@ przez [WhisperKit](https://github.com/argmaxinc/WhisperKit) (CoreML).
 Odpowiednik `android-benchmark/` na iOS.
 
 **Status: kod przetestowany i działający** (zweryfikowany na Symulatorze
-iOS — poprawnie rozpoznaje polską próbkę kalibracyjną). Nie testowany
-jeszcze na prawdziwym iPhonie — do tego służy ta instrukcja.
+iOS — działa poprawenie).
 
 ## Co potrzebujesz
 
 - Mac z zainstalowanym Xcode
 - Kabel do podłączenia iPhone'a do tego Maca (Lightning albo USB-C, zależnie od modelu)
-- iPhone z odblokowanym ekranem, żeby zatwierdzić "Trust This Computer"
 
 To wszystko — **nie potrzeba żadnego konta Apple Developer płatnego, żadnego
 eksportu `.ipa`, żadnej usługi typu Firebase/BrowserStack/AWS.** Podłączenie
@@ -39,7 +37,7 @@ cd testmacos
 
 1. **File → Add Package Dependencies...**
 2. Wklej: `https://github.com/argmaxinc/argmax-oss-swift`
-3. Naciśnij Enter/Return w polu wyszukiwania (nawet jeśli pokaże "No Results" — to normalne, i tak rozwiąże adres)
+3. Naciśnij Enter/Return w polu wyszukiwania 
 4. **Add Package** → zaznacz produkt **WhisperKit** → **Add Package**
 
 ### 4. Podmień pliki
@@ -67,8 +65,7 @@ pierwszej instalacji apki spoza App Store).
 ### 6. Test
 
 Na ekranie telefonu (albo w symulatorze na Macu podczas testu) pojawi się
-przycisk **"Uruchom benchmark"**. Kliknij go (na telefonie — dotknij palcem
-albo dłonią jeśli robicie to fizycznie).
+przycisk **"Uruchom benchmark"**. Kliknij go.
 
 Apka zrobi 10 kolejnych transkrypcji tej samej 10-sekundowej próbki audio
 (zawiera "VAS 6 na 10") bez przerwy, i pokaże na ekranie:
@@ -80,8 +77,7 @@ Apka zrobi 10 kolejnych transkrypcji tej samej 10-sekundowej próbki audio
 ### 7. Zapisz wynik
 
 Zrób zdjęcie/zrzut ekranu telefonu z pełnym podsumowaniem (przewiń log w
-dół do sekcji "=== PODSUMOWANIE ===") — albo po prostu przepisz/wyślij mi
-te kilka linijek tekstu, tak jak robiliśmy dla wyników z Androida.
+dół do sekcji "=== PODSUMOWANIE ===").
 
 **Powtórz na obu telefonach (iPhone 13 i iPhone 17)** — to jest ten sam
 sens co dwa punkty danych z Androida (starszy vs najnowszy) i dokładnie
@@ -89,13 +85,10 @@ uzupełnia tabelę "model × urządzenie" z briefu o platformę iOS.
 
 ## Jeśli coś nie zadziała
 
-- **Błąd kompilacji w Xcode** → wklej mi dokładną treść błędu (Issue
-  Navigator — ikonka trójkąta z wykrzyknikiem w lewym pasku)
 - **Ładowanie modelu trwa bardzo długo (minuty) przy pierwszym uruchomieniu**
   → to normalne, WhisperKit pobiera model (~630 MB) z sieci przy pierwszym
   starcie na danym urządzeniu. Drugie uruchomienie na tym samym telefonie
   powinno być dużo szybsze (model już zapisany lokalnie) — **do właściwego
   pomiaru RTF/throttlingu liczy się dopiero DRUGIE uruchomienie**, nie
   pierwsze (pierwsze zawiera czas pobierania, nie tylko ładowania)
-- **"Rozpoznany tekst" pusty albo bez sensu** → to już naprawiony problem
-  (wymuszony polski język w kodzie), ale jeśli się powtórzy — daj znać
+
